@@ -14,7 +14,7 @@ const tags = {
 
 const defaultMenu = {
   before: `
-—͟͟͞͞♱ *Registro Clover MD* »
+—͟͟͞͞ ♱   *Registro Clover MD* »
 > 🪐 𝙉𝙤𝙢𝙗𝙧𝙚   » %name
 > ⚙️ 𝙉𝙞𝙫𝙚𝙡     » %level
 > ⚡ 𝙀𝙭𝙥        » %exp / %maxexp
@@ -47,7 +47,7 @@ const loadMenuMedia = jid => {
 const fetchBuffer = async url =>
   Buffer.from(await (await fetch(url)).arrayBuffer())
 
-const defaultThumb = await fetchBuffer('https://qu.ax/a3EAp')
+const defaultThumb = await fetchBuffer('https://raw.githubusercontent.com/JTxs00/uploads/main/1776302012214.jpeg')
 const defaultVideo = await fetchBuffer('https://files.catbox.moe/0ln7v3.mp4')
 
 let handler = async (m, { conn, usedPrefix }) => {

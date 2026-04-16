@@ -18,7 +18,7 @@ let handler = async (m, { conn }) => {
 
   try {
     let media = await q.download();
-    if (!media || !Buffer.isBuffer(media)) {
+    if (!media || !(media instanceof Buffer)) {
       await m.react(error);
       return conn.reply(m.chat, `${emoji} No se pudo descargar el archivo.`, m);
     }
@@ -28,11 +28,10 @@ let handler = async (m, { conn }) => {
 
     let txt = `*乂 C A T B O X - U P L O A D E R 乂*\n\n`;
     txt += `*» Enlace* : ${link}\n`;
-    txt += `*» Tamaño* : ${formatBytes(media.length)}\n`;
+    txt += `*» Tamaño* : ${formatBytes(media.byteLength || media.length)}\n`;
     txt += `*» Expiración* : ${isTele ? 'No expira' : 'Desconocido'}\n\n`;
     txt += `> *${dev}*`;
 
-    // Enviar archivo con sendMessage
     await conn.sendMessage(m.chat, {
       document: media,
       mimetype: mime,
@@ -42,7 +41,7 @@ let handler = async (m, { conn }) => {
 
     await m.react(done);
   } catch (err) {
-    console.error('Error completo:', err);
+    console.error(err);
     await m.react(error);
     conn.reply(m.chat, `${emoji} Error al subir el archivo:\n${err.message}`, m);
   }
@@ -61,26 +60,25 @@ function formatBytes(bytes) {
 }
 
 async function catbox(content) {
-  const fileType = await fileTypeFromBuffer(content) || {};
-  const ext = fileType.ext || 'bin';
-  const mime = fileType.mime || 'application/octet-stream';
+  const type = await fileTypeFromBuffer(content) || {};
+  const ext = type.ext || 'bin';
+  const mime = type.mime || 'application/octet-stream';
 
   const blob = new Blob([content], { type: mime });
   const formData = new FormData();
   const randomBytes = crypto.randomBytes(5).toString("hex");
 
   formData.append("reqtype", "fileupload");
-  formData.append("fileToUpload", blob, randomBytes + "." + ext);
+  formData.append("fileToUpload", blob, `${randomBytes}.${ext}`);
 
   const response = await fetch("https://catbox.moe/user/api.php", {
     method: "POST",
     body: formData,
     headers: {
-      "User-Agent":
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
-    },
+      "User-Agent": "Mozilla/5.0"
+    }
   });
 
   if (!response.ok) throw new Error(`Error en Catbox: ${response.statusText}`);
-  return await response.text();
+  return (await response.text()).trim();
 }
