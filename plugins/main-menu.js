@@ -48,7 +48,7 @@ const fetchBuffer = async url =>
   Buffer.from(await (await fetch(url)).arrayBuffer())
 
 const defaultThumb = await fetchBuffer('https://raw.githubusercontent.com/JTxs00/uploads/main/1776302012214.jpeg')
-const defaultVideo = await fetchBuffer('https://files.catbox.moe/0ln7v3.mp4')
+const defaultVideo = await fetchBuffer('https://raw.githubusercontent.com/JTxs00/uploads/main/1776311203328.mp4')
 
 let handler = async (m, { conn, usedPrefix }) => {
   await conn.sendMessage(m.chat, { react: { text: '⚔️', key: m.key } })
