@@ -10,7 +10,7 @@ import ws from 'ws';
 
 const { proto } = (await import('@whiskeysockets/baileys')).default;
 const isNumber = x => typeof x === 'number' && !isNaN(x);
-const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(() => resolve(), ms));
+const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(resolve, ms));
 
 export async function handler(chatUpdate) {
   this.msgqueque ||= [];
@@ -115,12 +115,16 @@ export async function handler(chatUpdate) {
     const isOwner = isROwner || m.fromMe;
     const isPrems = isROwner || global.db.data.users[m.sender].premiumTime > 0;
 
-    if (opts["queque"] && m.text && !isMods) {
+    if (opts["queque"] && m.text && !global.mods?.includes(m.sender)) {
       const queque = this.msgqueque;
       const previousID = queque[queque.length - 1];
       queque.push(m.id || m.key.id);
-      setInterval(async () => { if (!queque.includes(previousID)) clearInterval(this); await delay(5000); }, 5000);
+      const interval = setInterval(async () => {
+        if (!queque.includes(previousID)) clearInterval(interval);
+        await delay(5000);
+      }, 5000);
     }
+
     if (m.isBaileys) return;
     m.exp += Math.ceil(Math.random() * 10);
     let usedPrefix;
@@ -132,12 +136,12 @@ export async function handler(chatUpdate) {
       return res[0]?.lid || id;
     }
 
-    const senderLid = await getLidFromJid(m.sender, conn);
-    const botLid = await getLidFromJid(conn.user.jid, conn);
+    const senderLid = await getLidFromJid(m.sender, this);
+    const botLid = await getLidFromJid(this.user.jid, this);
     const senderJid = m.sender;
-    const botJid = conn.user.jid;
+    const botJid = this.user.jid;
 
-    const groupMetadata = m.isGroup ? ((conn.chats[m.chat] || {}).metadata || await this.groupMetadata(m.chat).catch(() => null)) : {};
+    const groupMetadata = m.isGroup ? ((this.chats[m.chat] || {}).metadata || await this.groupMetadata(m.chat).catch(() => null)) : {};
     const participants = m.isGroup && groupMetadata ? groupMetadata.participants || [] : [];
 
     const user = participants.find(p => [p?.id, p?.jid].includes(senderLid) || [p?.id, p?.jid].includes(senderJid)) || {};
@@ -157,47 +161,57 @@ export async function handler(chatUpdate) {
       if (!opts['restrict'] && plugin.tags?.includes('admin')) continue;
 
       const str2Regex = str => str.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&');
-      let _prefix = plugin.customPrefix || conn.prefix || global.prefix;
+      let _prefix = plugin.customPrefix || this.prefix || global.prefix;
+
       let match = (_prefix instanceof RegExp ? [[_prefix.exec(m.text), _prefix]] :
         Array.isArray(_prefix) ? _prefix.map(p => [p instanceof RegExp ? p.exec(m.text) : new RegExp(str2Regex(p)).exec(m.text), p instanceof RegExp ? p : new RegExp(str2Regex(p))]) :
         [[new RegExp(str2Regex(_prefix)).exec(m.text), new RegExp(str2Regex(_prefix))]]
-      ).find(p => p[1]);
+      ).find(p => p[0]);
+
+      if (!match) continue;
 
       if (typeof plugin.before === 'function' && await plugin.before.call(this, m, { match, conn: this, participants, groupMetadata, user, bot, isROwner, isOwner, isRAdmin, isAdmin, isBotAdmin, isPrems, chatUpdate, __dirname: ___dirname, __filename })) continue;
       if (typeof plugin !== 'function') continue;
 
-      if ((usedPrefix = (match[0] || '')[0])) {
+      if ((usedPrefix = (match[0] || [''])[0])) {
         let noPrefix = m.text.replace(usedPrefix, '');
         let [command, ...args] = noPrefix.trim().split` `.filter(Boolean);
         args = args || [];
         let _args = noPrefix.trim().split` `.slice(1);
         let text = _args.join` `;
         command = (command || '').toLowerCase();
+
         let fail = plugin.fail || global.dfail;
+
         let isAccept = plugin.command instanceof RegExp ? plugin.command.test(command) :
           Array.isArray(plugin.command) ? plugin.command.some(cmd => cmd instanceof RegExp ? cmd.test(command) : cmd === command) :
           plugin.command === command;
 
         global.comando = command;
+
         if ((m.id.startsWith('NJX-') || (m.id.startsWith('BAE5') && m.id.length === 16) || (m.id.startsWith('B24E') && m.id.length === 20))) return;
         if (!isAccept) continue;
-
+        
         m.plugin = name;
         let chat = global.db.data.chats[m.chat];
         let user = global.db.data.users[m.sender];
+
         if (!['grupo-unbanchat.js', 'owner-exec.js', 'owner-exec2.js'].includes(name) && chat?.isBanned && !isROwner) return;
+
         if (m.text && user.banned && !isROwner) { 
           m.reply(`《✦》Estas baneado/a, no puedes usar comandos en este bot!\n\n${user.bannedReason ? `✰ *Motivo:* ${user.bannedReason}` : '✰ *Motivo:* Sin Especificar'}\n\n> ✧ Si este Bot es cuenta oficial y tiene evidencia que respalde que este mensaje es un error, puedes exponer tu caso con un moderador.`);
           return;
         }
 
         let adminMode = global.db.data.chats[m.chat].modoadmin;
-        let mini = `${plugins.botAdmin || plugins.admin || plugins.group || plugins || noPrefix || hl || m.text.slice(0, 1) == hl || plugins.command}`;
+        let mini = plugin.command || noPrefix;
+
         if (adminMode && !isOwner && !isROwner && m.isGroup && !isAdmin && mini) return;
+
         if (plugin.rowner && plugin.owner && !(isROwner || isOwner)) { fail('owner', m, this); continue; }
         if (plugin.rowner && !isROwner) { fail('rowner', m, this); continue; }
         if (plugin.owner && !isOwner) { fail('owner', m, this); continue; }
-        if (plugin.mods && !isMods) { fail('mods', m, this); continue; }
+        if (plugin.mods && !(global.mods || []).includes(m.sender)) { fail('mods', m, this); continue; }
         if (plugin.premium && !isPrems) { fail('premium', m, this); continue; }
         if (plugin.group && !m.isGroup) { fail('group', m, this); continue; }
         if (plugin.botAdmin && !isBotAdmin) { fail('botAdmin', m, this); continue; }
@@ -206,35 +220,41 @@ export async function handler(chatUpdate) {
         if (plugin.register && !_user.registered) { fail('unreg', m, this); continue; }
 
         m.isCommand = true;
+
         let xp = 'exp' in plugin ? parseInt(plugin.exp) : 10;
         m.exp += xp;
+
         if (!isPrems && plugin.monedas && _user.monedas < plugin.monedas) {
-          conn.reply(m.chat, `❮✦❯ Se agotaron tus ${monedas}`, m);
+          this.reply(m.chat, `❮✦❯ Se agotaron tus monedas`, m);
           continue;
         }
+
         if (plugin.level > _user.level) {
-          conn.reply(m.chat, `❮✦❯ Se requiere el nivel: *${plugin.level}*\n\n• Tu nivel actual es: *${_user.level}*\n\n• Usa este comando para subir de nivel:\n*${usedPrefix}levelup*`, m);
+          this.reply(m.chat, `❮✦❯ Se requiere el nivel: *${plugin.level}*\n\n• Tu nivel actual es: *${_user.level}*\n\n• Usa este comando para subir de nivel:\n*${usedPrefix}levelup*`, m);
           continue;
         }
 
         let extra = { match, usedPrefix, noPrefix, _args, args, command, text, conn: this, participants, groupMetadata, user, bot, isROwner, isOwner, isRAdmin, isAdmin, isBotAdmin, isPrems, chatUpdate, __dirname: ___dirname, __filename };
+
         try {
           await plugin.call(this, m, extra);
-          if (!isPrems) m.monedas = m.monedas || plugin.monedas || false;
+          if (!isPrems) m.monedas = m.monedas || plugin.monedas || 0;
         } catch (e) {
           m.error = e;
           let text = format(e);
-          for (let key of Object.values(global.APIKeys)) text = text.replace(new RegExp(key, 'g'), 'Administrador');
+          for (let key of Object.values(global.APIKeys || {})) text = text.replace(new RegExp(key, 'g'), 'Administrador');
           m.reply(text);
         } finally {
           if (typeof plugin.after === 'function') await plugin.after.call(this, m, extra).catch(console.error);
-          if (m.monedas) conn.reply(m.chat, `❮✦❯ Utilizaste ${+m.monedas} ${monedas}`, m);
+          if (m.monedas) this.reply(m.chat, `❮✦❯ Utilizaste ${+m.monedas} monedas`, m);
         }
+
         break;
       }
     }
 
   } catch (e) { console.error(e); } finally {
+
     if (opts['queque'] && m.text) {
       const quequeIndex = this.msgqueque.indexOf(m.id || m.key.id);
       if (quequeIndex !== -1) this.msgqueque.splice(quequeIndex, 1);
@@ -242,20 +262,27 @@ export async function handler(chatUpdate) {
 
     if (m) {
       let utente = global.db.data.users[m.sender];
-      if (utente.muto) await conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: m.key.id, participant: m.key.participant }});
+      if (utente.muto) await this.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: m.key.id, participant: m.key.participant }});
       utente.exp += m.exp;
-      utente.monedas -= m.monedas;
+      utente.monedas -= m.monedas || 0;
     }
 
-    let stats = global.db.data.stats;
+    let stats = global.db.data.stats = global.db.data.stats || {};
     if (m.plugin) {
       let now = +new Date();
       let stat = stats[m.plugin] || { total: 0, success: 0, last: 0, lastSuccess: 0 };
       stat.total += 1;
       stat.last = now;
-      if (!m.error) { stat.success += 1; stat.lastSuccess = now; }
+      if (!m.error) { 
+        stat.success += 1; 
+        stat.lastSuccess = now; 
+      }
       stats[m.plugin] = stat;
     }
+
+
+
+
 
     try { if (!opts['noprint']) await (await import('../lib/print.js')).default(m, this); } catch (e) { console.log(m, m.quoted, e); }
     if (opts['autoread']) await this.readMessages([m.key]);
