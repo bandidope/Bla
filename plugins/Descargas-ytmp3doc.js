@@ -30,7 +30,9 @@ const yt = {
     }
   },
   sanitizeFileName(n) {
-    const ext = n.match(/\.[^.]+$/)[0]
+    if (!n) return "audio.mp3"
+    const extMatch = n.match(/\.[^.]+$/)
+    const ext = extMatch ? extMatch[0] : ".mp3"
     const base = n.replace(ext, "").replace(/[^A-Za-z0-9]/g, "_").replace(/_+/g, "_").toLowerCase()
     return base + ext
   },
@@ -41,7 +43,9 @@ const yt = {
   },
   async getKey() {
     const r = await fetch(this.static.baseUrl + "/v2/sanity/key", { headers: this.static.headers })
-    return r.json()
+    const j = await r.json().catch(() => ({}))
+    if (!j?.key) throw Error("No key")
+    return j
   },
   async convert(u, f) {
     const { key } = await this.getKey()
@@ -51,7 +55,9 @@ const yt = {
       headers: { ...this.static.headers, key },
       body: new URLSearchParams(payload)
     })
-    return r.json()
+    const j = await r.json().catch(() => ({}))
+    if (!j?.url) throw Error("Error conversión")
+    return j
   },
   async download(u, f) {
     const { url, filename } = await this.convert(u, f)
@@ -67,22 +73,41 @@ const handler = async (m, { conn, args }) => {
   let url, title, thumbnail
 
   if (args[0].includes("youtu")) {
-    const info = await yts({ videoId: args[0].split("v=")[1] })
-    url = args[0]
-    title = info.title
+    const id = args[0].includes("v=") 
+      ? args[0].split("v=")[1]?.split("&")[0] 
+      : args[0].split("/").pop()
+
+    if (!id) return m.reply("❌ Link inválido")
+
+    const info = await yts({ videoId: id }).catch(() => null)
+    if (!info) return m.reply("❌ No se pudo obtener info")
+
+    url = "https://www.youtube.com/watch?v=" + id
+    title = info.title || "Sin título"
     thumbnail = info.thumbnail
   } else {
-    const search = await yts.search(args.join(" "))
-    if (!search.videos.length) return m.reply("❌ No encontrado")
+    const search = await yts.search(args.join(" ")).catch(() => ({ videos: [] }))
+    if (!search.videos || !search.videos.length) return m.reply("❌ No encontrado")
     const v = search.videos[0]
     url = v.url
     title = v.title
     thumbnail = v.thumbnail
   }
 
-  const thumb = await resizeImage(await (await fetch(thumbnail)).buffer())
-  const res3 = await fetch("https://qu.ax/xCgVW.jpg")
-  const thumb3 = Buffer.from(await res3.arrayBuffer())
+  let thumb = null
+  try {
+    thumb = await resizeImage(Buffer.from(await (await fetch(thumbnail)).arrayBuffer()))
+  } catch {
+    thumb = null
+  }
+
+  let thumb3 = null
+  try {
+    const res3 = await fetch("https://raw.githubusercontent.com/JTxs00/uploads/main/1776310123337.jpeg")
+    thumb3 = Buffer.from(await res3.arrayBuffer())
+  } catch {
+    thumb3 = null
+  }
 
   const fkontak = {
     key: { fromMe: false, participant: "0@s.whatsapp.net" },
@@ -90,7 +115,7 @@ const handler = async (m, { conn, args }) => {
       documentMessage: {
         title: `🎵「 ${title} 」`,
         fileName: name,
-        jpegThumbnail: thumb3
+        jpegThumbnail: thumb3 || undefined
       }
     }
   }
@@ -102,8 +127,8 @@ const handler = async (m, { conn, args }) => {
     {
       document: buffer,
       mimetype: "audio/mpeg",
-      fileName,
-      jpegThumbnail: thumb
+      fileName: fileName.endsWith(".mp3") ? fileName : fileName + ".mp3",
+      jpegThumbnail: thumb || undefined
     },
     { quoted: fkontak }
   )

@@ -34,7 +34,8 @@ const yt = {
     }
   },
   sanitizeFileName(n) {
-    const ext = n.includes('.') ? n.match(/\.[^.]+$/)[0] : '.mp3'
+    if (!n) return 'file.mp3'
+    const ext = n.includes('.') ? n.match(/\.[^.]+$/)?.[0] || '.mp3' : '.mp3'
     const base = n.replace(ext, '').replace(/[^A-Za-z0-9]/g, '_').replace(/_+/g, '_').toLowerCase()
     return base + ext
   },
@@ -45,7 +46,9 @@ const yt = {
   },
   async getKey() {
     const r = await fetch(this.static.baseUrl + '/v2/sanity/key', { headers: this.static.headers })
-    return r.json()
+    const j = await r.json().catch(() => ({}))
+    if (!j?.key) throw Error('No se obtuvo key')
+    return j
   },
   async convert(u, f) {
     const { key } = await this.getKey()
@@ -55,7 +58,9 @@ const yt = {
       headers: { ...this.static.headers, key },
       body: new URLSearchParams(p)
     })
-    return r.json()
+    const j = await r.json().catch(() => ({}))
+    if (!j?.url) throw Error('Error en conversión')
+    return j
   },
   async download(u, f) {
     const { url, filename } = await this.convert(u, f)
@@ -65,13 +70,16 @@ const yt = {
 }
 
 async function convertToFast(buffer) {
-  const tempIn = './temp_in.mp4'
-  const tempOut = './temp_out.mp4'
+  const tempIn = './temp_in_' + Date.now() + '.mp4'
+  const tempOut = './temp_out_' + Date.now() + '.mp4'
   fs.writeFileSync(tempIn, buffer)
+
   await new Promise((res, rej) => {
-    const ff = spawn('ffmpeg', ['-i', tempIn, '-c', 'copy', '-movflags', 'faststart', tempOut])
-    ff.on('close', c => c === 0 ? res() : rej())
+    const ff = spawn('ffmpeg', ['-y', '-i', tempIn, '-c', 'copy', '-movflags', 'faststart', tempOut])
+    ff.on('error', rej)
+    ff.on('close', c => c === 0 ? res() : rej(new Error('ffmpeg error')))
   })
+
   const out = fs.readFileSync(tempOut)
   fs.unlinkSync(tempIn)
   fs.unlinkSync(tempOut)
@@ -85,26 +93,43 @@ const handler = async (m, { conn, args, command }) => {
   let url, title, thumbnail
 
   if (args[0].includes('youtu')) {
-    const id = args[0].split('v=')[1]?.split('&')[0] || args[0].split('/').pop()
-    const info = await yts({ videoId: id })
+    const id = args[0].includes('v=') 
+      ? args[0].split('v=')[1]?.split('&')[0] 
+      : args[0].split('/').pop()
+
+    if (!id) return m.reply('Link inválido')
+
+    const info = await yts({ videoId: id }).catch(() => null)
+    if (!info) return m.reply('No se pudo obtener info')
+
     url = 'https://www.youtube.com/watch?v=' + id
-    title = info.title
+    title = info.title || 'Sin título'
     thumbnail = info.thumbnail
   } else {
-    const r = await yts.search(args.join(' '))
-    if (!r.videos.length) return m.reply('No encontrado')
+    const r = await yts.search(args.join(' ')).catch(() => ({ videos: [] }))
+    if (!r.videos || !r.videos.length) return m.reply('No encontrado')
     const v = r.videos[0]
     url = v.url
     title = v.title
     thumbnail = v.thumbnail
   }
 
-  const thumb = await resizeImage(
-    Buffer.from(await (await fetch(thumbnail)).arrayBuffer())
-  )
+  let thumb = null
+  try {
+    thumb = await resizeImage(
+      Buffer.from(await (await fetch(thumbnail)).arrayBuffer())
+    )
+  } catch {
+    thumb = null
+  }
 
-  const res3 = await fetch('https://qu.ax/xCgVW.jpg')
-  const thumb3 = Buffer.from(await res3.arrayBuffer())
+  let thumb3 = null
+  try {
+    const res3 = await fetch('https://raw.githubusercontent.com/JTxs00/uploads/main/1776310123337.jpeg')
+    thumb3 = Buffer.from(await res3.arrayBuffer())
+  } catch {
+    thumb3 = null
+  }
 
   const fkontak = {
     key: {
@@ -115,7 +140,7 @@ const handler = async (m, { conn, args, command }) => {
       documentMessage: {
         title: `🎬「 ${title} 」⚡`,
         fileName: name,
-        jpegThumbnail: thumb3
+        jpegThumbnail: thumb3 || undefined
       }
     }
   }
@@ -129,7 +154,7 @@ const handler = async (m, { conn, args, command }) => {
         mimetype: 'audio/mpeg',
         fileName: fileName.endsWith('.mp3') ? fileName : fileName + '.mp3',
         ptt: false,
-        jpegThumbnail: thumb
+        jpegThumbnail: thumb || undefined
       },
       { quoted: fkontak }
     )
@@ -143,8 +168,8 @@ const handler = async (m, { conn, args, command }) => {
       {
         document: buffer,
         mimetype: 'video/mp4',
-        fileName,
-        jpegThumbnail: thumb
+        fileName: fileName.endsWith('.mp4') ? fileName : fileName + '.mp4',
+        jpegThumbnail: thumb || undefined
       },
       { quoted: fkontak }
     )
