@@ -1,5 +1,5 @@
 {
-  "name": "black-clover-MD",
+  "name": "Gengar_Bot_Md",
   "version": "7.7.7",
   "description": "El Mejor bot de WhatsApp",
   "main": "index.js",
@@ -21,9 +21,9 @@
     "eslint": "eslint .",
     "eslintfix": "eslint --fix ."
   },
-  "homepage": "https://github.com/thecarlos19/black-clover-MD",
+  "homepage": "https://github.com/WhoisYallico/Gengar_Bot_Md",
   "author": {
-    "name": "thecarlos19"
+    "name": "WhoisYallico"
   },
   "collaborators": {
     "col1": "Antuan",
@@ -32,10 +32,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thecarlos19/black-clover-MD.git"
+    "url": "git+https://github.com/WhoisYallico/Gengar_Bot_Md.git"
   },
   "bugs": {
-    "url": "https://github.com/thecarlos19/black-clover-MD/issues"
+    "url": "https://github.com/WhoisYallico/Gengar_Bot_Md/issues"
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {

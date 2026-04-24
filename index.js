@@ -7,7 +7,7 @@ import cfonts from 'cfonts'
 import { createInterface } from 'readline'
 import chalk from 'chalk'
 
-console.log(chalk.bold.hex('#00FFFF')('\n✞─ Iniciando Black Clover IA ─✞'))
+console.log(chalk.bold.hex('#00FFFF')('\n✞─ Iniciando Gengar Bot IA ─✞'))
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const require = createRequire(__dirname)
@@ -20,13 +20,13 @@ const rl = createInterface({
 
 async function barraCargaCyberpunk() {
   const frames = [
-    '[⏳] Iniciando Black Clover...',
+    '[⏳] Iniciando Gengar Bot...',
     '[🔮] Reuniendo maná primitivo...',
     '[💾] Cargando hechizos prohibidos...',
     '[⚡] Sincronizando con demonios...',
     '[🔥] Fusión de magia negra...',
     '[🌌] Apertura del Reino Oscuro...',
-    '[✅] ASTA-BOT 100% OPERATIVO.'
+    '[✅] Gengar Bot100% OPERATIVO.'
   ]
   for (let frame of frames) {
     process.stdout.write('\r' + chalk.cyanBright(frame))
@@ -93,7 +93,7 @@ chalk.hex('#FF00FF')(`
 async function iniciarBlackClover() {
   console.clear()
 
-  console.log(chalk.bold.cyanBright('\n⟦ ⌬ ACCESO CONCEDIDO | ASTA-BOT V.777 ⟧'))
+  console.log(chalk.bold.cyanBright('\n⟦ ⌬ ACCESO CONCEDIDO | Gengar BotV.777 ⟧'))
   console.log(chalk.gray('⌬ Canalizando acceso mágico...'))
   await new Promise(res => setTimeout(res, 600))
 
@@ -124,7 +124,7 @@ async function iniciarBlackClover() {
   await new Promise(res => setTimeout(res, 800))
 
   console.log(chalk.bold.hex('#FF00FF')('\n⌬═════════════════════⌬'))
-  console.log(chalk.bold.white('      SISTEMA CREO POR: ') + chalk.bold.hex('#FFD700')('The Carlos 👑'))
+  console.log(chalk.bold.white('      SISTEMA CREO POR: ') + chalk.bold.hex('#FFD700')('Whois Yallico 👑'))
   console.log(chalk.bold.hex('#FF00FF')('⌬═══════════════════════⌬\n'))
 
   await new Promise(res => setTimeout(res, 1200))
