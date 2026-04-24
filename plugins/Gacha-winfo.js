@@ -91,6 +91,6 @@ handler.help = ['charinfo <nombre>', 'winfo <nombre>', 'waifuinfo <nombre>'];
 handler.tags = ['anime'];
 handler.command = ['charinfo', 'winfo', 'waifuinfo'];
 handler.group = true;
-handler.register = true;
+
 
 export default handler;

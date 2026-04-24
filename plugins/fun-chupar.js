@@ -13,5 +13,5 @@ conn.reply(m.chat, `
 
 handler.command ='chupar', /^(chupar|Chupar|chuparsela|violar)/i
 handler.fail = null
-handler.register = true
+
 export default handler

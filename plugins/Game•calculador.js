@@ -145,7 +145,7 @@ handler.help = [
 ]
 
 handler.tags = ['fun']
-handler.register = true
+
 handler.group = true
 handler.command = [
   'gay', 'lesbiana', 'pajero', 'pajera',

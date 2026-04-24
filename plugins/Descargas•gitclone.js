@@ -4,7 +4,7 @@ import { join } from 'path'
 import axios from 'axios'
 import Jimp from 'jimp'
 
-const name = "Descargas - black clover"
+const name = "Descargas - Gengar Bot"
 
 async function resizeImage(buffer, size = 300) {
   const img = await Jimp.read(buffer)
@@ -56,6 +56,6 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 handler.help = ['gitclone']
 handler.tags = ['buscador']
 handler.command = ['gitclone']
-handler.register = true
+
 
 export default handler

@@ -5,7 +5,7 @@ import yts from 'yt-search'
 import Jimp from 'jimp'
 import axios from 'axios'
 
-const name = 'Descargas - black clover'
+const name = 'Descargas - Whois Yallico'
 
 async function resizeImage(buffer, size = 300) {
   const img = await Jimp.read(buffer)

@@ -5,7 +5,7 @@ import yts from "yt-search"
 import Jimp from "jimp"
 import axios from "axios"
 
-const packname = "Descargas - black clover"
+const packname = "Descargas - Gengar Bot"
 
 const imgSquare = async (buf, s = 300) => {
   const i = await Jimp.read(buf)

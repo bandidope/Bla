@@ -25,6 +25,6 @@ handler.help = ['formartrio @usuario1 @usuario2'];
 handler.tags = ['fun'];
 handler.command = ['formartrio']
 handler.group = true;
-handler.register = true;
+
 
 export default handler;

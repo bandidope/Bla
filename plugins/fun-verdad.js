@@ -3,7 +3,7 @@ const handler = async (m, { conn }) => {
 
 *⚄︎.- ${pickRandom(global.verdad)}*
 
-*◣ ──「  Black Clover 」── ◢*
+*◣ ──「  Gengar Bot 」── ◢*
   `, m, {
     contextInfo: global.rcanal
   });
@@ -12,7 +12,7 @@ const handler = async (m, { conn }) => {
 handler.help = ['verdad'];
 handler.tags = ['fun'];
 handler.command ='verdad', /^verdad/i;
-handler.register = true;
+
 
 export default handler;
 

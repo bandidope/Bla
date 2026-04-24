@@ -62,6 +62,5 @@ Uso:
 handler.help = ['ppt <piedra|papel|tijera>'];
 handler.tags = ['fun'];
 handler.command = ['ppt'];
-handler.register = true;
 
 export default handler;
