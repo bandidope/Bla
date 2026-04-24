@@ -9,7 +9,7 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
   const username = conn.getName(m.sender)
 
   const basePrompt =
-    `Tu nombre es asta-Bot, creado por The Carlos. Hablas español. ` +
+    `Tu nombre es Gengar, creado por Whois Yallico . Hablas español. ` +
     `Te diriges al usuario como ${username}. Eres amigable, divertida y te gustan las explosiones.`
 
   if (isQuotedImage) {
@@ -58,7 +58,6 @@ let handler = async (m, { conn, usedPrefix, command, text }) => {
 handler.help = ['chatgpt <texto>', 'ia <texto>']
 handler.tags = ['ai']
 handler.group = true
-handler.register = true
 handler.command = ['ia', 'chatgpt']
 
 export default handler

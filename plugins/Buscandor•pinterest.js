@@ -5,7 +5,7 @@ let handler = async (m, { conn, args }) => {
   const rwait = '⏳'
   const done = '✅'
   const error = '❌'
-  const dev = 'by The Carlos 👑'
+  const dev = 'by Whois Yallico  👑'
 
   const text = args.join(' ')
 

@@ -23,7 +23,7 @@ Elige una de las opciones para descargar:
     {
       image: { url: videoInfo.thumbnail },
       caption: body,
-      footer: `𝕭𝖑𝖆𝖈𝖐 𝕮𝖑𝖔𝖛𝖊𝖗 ☘︎| ⚔️🥷`,
+      footer: `Gengar Bot ☘︎| ⚔️🥷`,
       buttons: [
         { buttonId: `.ytmp3 ${videoInfo.url}`, buttonText: { displayText: '🎧 Audio' } },
         { buttonId: `.ytmp4 ${videoInfo.url}`, buttonText: { displayText: '📽️ Video' } },
@@ -36,7 +36,7 @@ Elige una de las opciones para descargar:
         externalAdReply: {
           showAdAttribution: false,
           title: '📡 Descargas clover',
-          body: '✡︎ Dev • TheCarlos',
+          body: '✡︎ Dev • Whois Yallico',
           mediaType: 2,
           sourceUrl: global.redes || '',
           thumbnail: global.icons || null

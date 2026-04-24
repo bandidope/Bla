@@ -4,7 +4,7 @@ import baileys from '@whiskeysockets/baileys'
 
 const { proto, generateWAMessageFromContent, generateWAMessageContent } = baileys
 
-const name = "Descargas - black clover"
+const name = "Descargas - Gengar Bot"
 
 async function resizeImage(buffer, size = 300) {
   const img = await Jimp.read(buffer)
@@ -142,7 +142,6 @@ let handler = async (m, { conn, text }) => {
 handler.help = ['tiktoksearch <texto>']
 handler.tags = ['downloader']
 handler.command = ['tiktoksearch', 'tts', 'ttsearch']
-handler.register = true
 handler.group = true
 
 export default handler

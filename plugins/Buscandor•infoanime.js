@@ -2,7 +2,7 @@ import fetch from 'node-fetch'
 
 var handler = async (m, { conn, usedPrefix, command, text }) => {
   if (!text) 
-    return conn.sendMessage(m.chat, { text: `🍟 *Ingrese el nombre de algún anime*\n\nEjemplo: ${usedPrefix + command} black clover` }, { quoted: m })
+    return conn.sendMessage(m.chat, { text: `🍟 *Ingrese el nombre de algún anime*\n\nEjemplo: ${usedPrefix + command} Gengar Bot` }, { quoted: m })
 
   let res = await fetch('https://api.jikan.moe/v4/manga?q=' + encodeURIComponent(text))
   if (!res.ok) 
@@ -39,5 +39,4 @@ var handler = async (m, { conn, usedPrefix, command, text }) => {
 handler.help = ['infoanime']
 handler.tags = ['anime']
 handler.command = ['infoanime', 'animeinfo']
-handler.register = true
 export default handler

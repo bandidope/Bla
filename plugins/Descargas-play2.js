@@ -44,7 +44,7 @@ text: `🎧 *Resultados para:* ${text}
 Selecciona una canción:`
 },
 footer: {
-text: 'Black Clover ☘️ - Sistema de Música'
+text: 'Gengar Bot ☘️ - Sistema de Música'
 },
 header: {
 type: 'IMAGE',

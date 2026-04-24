@@ -7,7 +7,7 @@ let handler = async (m, { conn }) => {
   const rwait = '⏳'
   const done = '✅'
   const error = '❌'
-  const dev = ' by The Carlos 👑'
+  const dev = ' by Whois Yallico 👑'
   const fkontak = {}
 
   let q = m.quoted ? m.quoted : m
@@ -46,7 +46,6 @@ let handler = async (m, { conn }) => {
 
 handler.help = ['tourl']
 handler.tags = ['transformador']
-handler.register = true
 handler.command = ['tourl', 'upload']
 
 export default handler

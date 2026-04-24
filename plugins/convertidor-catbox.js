@@ -8,7 +8,7 @@ let handler = async (m, { conn }) => {
   const rwait = '⏳';
   const done = '✅';
   const error = '❌';
-  const dev = 'by The Carlos 👑';
+  const dev = 'by Whois Yallico 👑';
 
   let q = m.quoted ? m.quoted : m;
   let mime = (q.msg || q).mimetype || '';
