@@ -99,11 +99,11 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   try {
     profilePic = await conn.profilePictureUrl(m.sender, 'image')
   } catch {
-    profilePic = 'https://api.dix.lat/media/img_1776985512728_kChvt5is7D.jpg'
+    profilePic = 'https://raw.githubusercontent.com/JTxs00/uploads/main/1776310123337.jpeg'
   }
 
   const registroImg = await ensureImage('perfil.jpg', profilePic)
-  const thumbnailBuffer = fs.readFileSync(await ensureImage('registro_completo.jpg', 'https://api.dix.lat/media/img_1776985512728_kChvt5is7D.jpg'))
+  const thumbnailBuffer = fs.readFileSync(await ensureImage('registro_completo.jpg', 'https://raw.githubusercontent.com/JTxs00/uploads/main/1776310123337.jpeg'))
 
   let responseMessage = `> *🌿!**R E G I S T R O  M Á G I C O*\n\n`
   responseMessage += `> *!* ✧──『 ⚜️ 𝗗𝗔𝗧𝗢𝗦 ⚜️ 』\n`

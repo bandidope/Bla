@@ -4,7 +4,7 @@
 import PhoneNumber from 'awesome-phonenumber'
 import fetch from 'node-fetch'
 
-const imagen1 = 'https://files.catbox.moe/7sc3os.jpg'
+const imagen1 = 'https://raw.githubusercontent.com/JTxs00/uploads/main/1776310123337.jpeg'
 
 var handler = async (m, { conn }) => {
   let who = m.mentionedJid && m.mentionedJid[0]
